@@ -1,8 +1,45 @@
+import { ApexOptions } from "apexcharts";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import ReactApexChart from "react-apexcharts";
 
-let options = {
+type ChartConfig = {
+  chart: {
+    id: string;
+    type: string;
+    height: number;
+    zoom: {
+      autoScaleYaxis: boolean;
+    };
+  };
+  dataLabels: {
+    enabled: boolean;
+  };
+  markers: {
+    size: number;
+    style: string;
+  };
+  xaxis: {
+    type: string;
+    tickAmount: number;
+  };
+  tooltip: {
+    x: {
+      format: string;
+    };
+  };
+  fill: {
+    type: string;
+    gradient: {
+      shadeIntensity: number;
+      opacityFrom: number;
+      opacityTo: number;
+      stops: number[];
+    };
+  };
+};
+
+let options: ApexOptions = {
   chart: {
     id: "area-datetime",
     type: "area",
@@ -16,7 +53,7 @@ let options = {
   },
   markers: {
     size: 0,
-    style: "hollow",
+    //style: "hollow",
   },
   xaxis: {
     type: "datetime",
@@ -57,6 +94,7 @@ export default function CustomChart({ data }: { data: any }) {
       ]);
     }
   }, [data]);
+
   function updateData(timeline: string) {
     setSelection(timeline);
 
@@ -88,7 +126,6 @@ export default function CustomChart({ data }: { data: any }) {
       default:
     }
   }
-
   return (
     <div>
       <div id="chart">
@@ -117,7 +154,6 @@ export default function CustomChart({ data }: { data: any }) {
             1Y
           </button>
         </div>
-
         <div id="chart-timeline">
           <ReactApexChart
             options={options}

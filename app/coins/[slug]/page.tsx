@@ -6,6 +6,14 @@ import { useEffect, useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import CustomChart from "@/components/chart/chart";
 
+interface DataType {
+  id: string;
+  market_data: any;
+  name: string;
+  description: any;
+  image: any;
+}
+
 const priceFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
   currency: "USD",
@@ -13,7 +21,13 @@ const priceFormatter = new Intl.NumberFormat("en-US", {
 });
 
 export default function Coin({ params }: { params: { slug: string } }) {
-  const [data, setData] = useState({});
+  const [data, setData] = useState<DataType>({
+    id: "",
+    name: "",
+    market_data: {},
+    description: "",
+    image: {},
+  });
   const [chartData, setChartData] = useState(null);
 
   const items: DescriptionsProps["items"] = [
@@ -25,17 +39,17 @@ export default function Coin({ params }: { params: { slug: string } }) {
     {
       key: "2",
       label: "24 hr Highest",
-      children: priceFormatter.format(data?.market_data?.high_24h.usd),
+      children: priceFormatter.format(data?.market_data?.high_24h?.usd),
     },
     {
       key: "3",
       label: "24 hr Lowest",
-      children: priceFormatter.format(data?.market_data?.low_24h.usd),
+      children: priceFormatter.format(data?.market_data?.low_24h?.usd),
     },
     {
       key: "4",
       label: "Current Price",
-      children: priceFormatter.format(data.market_data?.current_price.usd),
+      children: priceFormatter.format(data.market_data?.current_price?.usd),
     },
     {
       key: "5",

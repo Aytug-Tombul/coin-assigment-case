@@ -134,7 +134,7 @@ function CoinTable({ getCoinsData }: Props) {
         <>
           <Button
             name={record.id}
-            onClick={(e) => handleFavorite(e)}
+            //onClick={(e) => handleFavorite(e)}
             type="link"
             size={"small"}
           >
