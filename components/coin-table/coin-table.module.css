@@ -1,0 +1,11 @@
+.coin-table {
+  margin: 15px;
+}
+
+.high {
+  color: green;
+}
+
+.low {
+  color: red;
+}
