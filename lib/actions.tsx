@@ -1,12 +1,5 @@
 "use server";
 const main_url = "https://api.coingecko.com/api/v3/coins/";
-const options = {
-  method: "GET",
-  headers: {},
-  next: {
-    revalidate: 300,
-  },
-};
 
 const currency = "usd";
 
@@ -16,8 +9,6 @@ export async function getCoins(page: string) {
     per_page: "250",
     page: page,
   };
-  const requestHeaders: HeadersInit = new Headers();
-  requestHeaders.set("x-cg-demo-api-key", process.env.GECKO_APIKEY);
   let url = main_url + "markets?" + new URLSearchParams(params);
 
   const res = await fetch(url, {
@@ -34,7 +25,6 @@ export async function getCoins(page: string) {
 }
 
 export async function getCoinDetail(id: string) {
-  const requestHeaders: HeadersInit = new Headers();
   let params = {
     localization: "false",
     tickers: "false",
@@ -43,7 +33,7 @@ export async function getCoinDetail(id: string) {
     developer_data: "false",
     sparkline: "false",
   };
-  requestHeaders.set("x-cg-demo-api-key", process.env.GECKO_APIKEY);
+
   let url = main_url + id + "?" + new URLSearchParams(params);
 
   const res = await fetch(url, {
@@ -60,11 +50,11 @@ export async function getCoinDetail(id: string) {
   return res.json();
 }
 
-export async function getChartData(id: string) {
+export async function getChartData(id: string, days: string = "365") {
   const requestHeaders: HeadersInit = new Headers();
   let params = {
     vs_currency: currency,
-    days: "365",
+    days: days,
     precision: "4",
   };
   requestHeaders.set("x-cg-demo-api-key", process.env.GECKO_APIKEY);

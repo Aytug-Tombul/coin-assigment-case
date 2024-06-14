@@ -1,43 +1,9 @@
+"use client";
+
 import { ApexOptions } from "apexcharts";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import ReactApexChart from "react-apexcharts";
-
-type ChartConfig = {
-  chart: {
-    id: string;
-    type: string;
-    height: number;
-    zoom: {
-      autoScaleYaxis: boolean;
-    };
-  };
-  dataLabels: {
-    enabled: boolean;
-  };
-  markers: {
-    size: number;
-    style: string;
-  };
-  xaxis: {
-    type: string;
-    tickAmount: number;
-  };
-  tooltip: {
-    x: {
-      format: string;
-    };
-  };
-  fill: {
-    type: string;
-    gradient: {
-      shadeIntensity: number;
-      opacityFrom: number;
-      opacityTo: number;
-      stops: number[];
-    };
-  };
-};
 
 let options: ApexOptions = {
   chart: {
@@ -75,7 +41,15 @@ let options: ApexOptions = {
   },
 };
 
-export default function CustomChart({ data }: { data: any }) {
+export default function CustomChart({
+  data,
+  height = 350,
+  toolbar = true,
+}: {
+  data: any;
+  height: number | undefined;
+  toolbar: boolean | undefined;
+}) {
   const [selection, setSelection] = useState("one_year");
   const [chartData, setChartData] = useState([
     {
@@ -129,37 +103,40 @@ export default function CustomChart({ data }: { data: any }) {
   return (
     <div>
       <div id="chart">
-        <div className="toolbar">
-          <button
-            id="one_month"
-            onClick={() => updateData("one_month")}
-            className={selection === "one_month" ? "active" : ""}
-          >
-            1M
-          </button>
+        {toolbar ? (
+          <div className="toolbar">
+            <button
+              id="one_month"
+              onClick={() => updateData("one_month")}
+              className={selection === "one_month" ? "active" : ""}
+            >
+              1M
+            </button>
 
-          <button
-            id="six_months"
-            onClick={() => updateData("six_months")}
-            className={selection === "six_months" ? "active" : ""}
-          >
-            6M
-          </button>
+            <button
+              id="six_months"
+              onClick={() => updateData("six_months")}
+              className={selection === "six_months" ? "active" : ""}
+            >
+              6M
+            </button>
 
-          <button
-            id="one_year"
-            onClick={() => updateData("one_year")}
-            className={selection === "one_year" ? "active" : ""}
-          >
-            1Y
-          </button>
-        </div>
+            <button
+              id="one_year"
+              onClick={() => updateData("one_year")}
+              className={selection === "one_year" ? "active" : ""}
+            >
+              1Y
+            </button>
+          </div>
+        ) : null}
+
         <div id="chart-timeline">
           <ReactApexChart
             options={options}
             series={chartData}
             type="area"
-            height={350}
+            height={height}
           />
         </div>
       </div>

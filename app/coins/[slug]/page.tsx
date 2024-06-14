@@ -3,25 +3,21 @@ import { Avatar, Card, Descriptions, DescriptionsProps } from "antd";
 import classes from "./page.module.css";
 import { getChartData, getCoinDetail } from "@/lib/actions";
 import { useEffect, useState } from "react";
-import ReactApexChart from "react-apexcharts";
-import CustomChart from "@/components/chart/chart";
+import { priceFormatter } from "@/lib/helper";
+import dynamic from "next/dynamic";
 
-interface DataType {
+export interface CoinDataType {
   id: string;
   market_data: any;
   name: string;
   description: any;
   image: any;
 }
-
-const priceFormatter = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-  currencyDisplay: "narrowSymbol",
+const CustomChart = dynamic(() => import("@/components/chart/chart"), {
+  ssr: false,
 });
-
 export default function Coin({ params }: { params: { slug: string } }) {
-  const [data, setData] = useState<DataType>({
+  const [data, setData] = useState<CoinDataType>({
     id: "",
     name: "",
     market_data: {},
@@ -82,7 +78,6 @@ export default function Coin({ params }: { params: { slug: string } }) {
       ),
     },
   ];
-
   useEffect(() => {
     getData();
     getChart();
@@ -119,7 +114,7 @@ export default function Coin({ params }: { params: { slug: string } }) {
       <Descriptions title="Coin Info" bordered items={items} />
       <Card className={classes.maincard} title="Coin Chart" bordered={false}>
         <div id="chart">
-          <CustomChart data={chartData} />
+          <CustomChart data={chartData} height={350} toolbar={true} />
         </div>
       </Card>
     </Card>

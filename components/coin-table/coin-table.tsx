@@ -1,11 +1,12 @@
 "use client";
 
-import { Avatar, Button, Card, Space, Table, TableProps, Tag } from "antd";
+import { Avatar, Card, Table, TableProps } from "antd";
 import classes from "./coin-table.module.css";
-import { StarOutlined, EyeOutlined } from "@ant-design/icons";
-import { getCoins } from "@/lib/actions";
-import React, { Suspense, SyntheticEvent, useEffect, useState } from "react";
+import { StarOutlined, EyeOutlined, StarFilled } from "@ant-design/icons";
+import React, { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
+import CoinsLoadingPage from "@/app/loading";
+import Loading from "@/app/loading";
 
 interface DataType {
   id: string;
@@ -48,32 +49,47 @@ const priceFormatter = new Intl.NumberFormat("en-US", {
 
 interface Props {
   getCoinsData: Function;
+  favorites: string[];
+  handleFavorite: Function;
 }
 
-function CoinTable({ getCoinsData }: Props) {
-  const [page, setPage] = useState(1);
-  const [data, setData] = useState([]);
+function CoinTable({ getCoinsData, favorites, handleFavorite }: Props) {
+  const [page, setPage] = useState({
+    fetched: [1],
+    count: 1,
+  });
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<any[]>([]);
+
   function getData(page: string) {
     getCoinsData().then((res: any) => {
       setData(res);
     });
   }
+  function handlePageChange(pageCount: number) {
+    if (pageCount % 25 === 0) {
+      if (!page.fetched.includes(pageCount / 25 + 1)) {
+        getCoinsData((page.count + 1).toString()).then((res: any) => {
+          setData((prev) => [...prev, ...res]);
+          setPage((prev) => {
+            return {
+              fetched: [...prev.fetched, page.count + 1],
+              count: prev.count + 1,
+            };
+          });
+        });
+      }
+    }
+  }
 
   useEffect(() => {
-    getData("1");
+    getData(page.toString());
+    setLoading(false);
   }, []);
 
-  /*const [favorites, setFavorites] = useState(() => {
-    let storedFavorites = null;
-    if (typeof window !== "undefined") {
-      storedFavorites = localStorage.getItem("favorites");
-    }
-
-    if (!storedFavorites) {
-      return [];
-    }
-    return JSON.parse(storedFavorites);
-  });*/
+  if (loading) {
+    return <Loading />;
+  }
   const columns: TableProps<DataType>["columns"] = [
     {
       title: "Name",
@@ -131,53 +147,38 @@ function CoinTable({ getCoinsData }: Props) {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <>
-          <Button
-            name={record.id}
-            //onClick={(e) => handleFavorite(e)}
-            type="link"
-            size={"small"}
-          >
-            <StarOutlined onClick={(e) => e.stopPropagation()} />
-            {/*favorites.includes(record.id) ? (
-            <StarFilled onClick={(e) => e.stopPropagation()} />
+        <div className={classes.actionCell}>
+          {favorites.includes(record.id) ? (
+            <span>
+              <StarFilled onClick={() => handleFavorite(record.id)} />
+            </span>
           ) : (
-            <StarOutlined onClick={(e) => e.stopPropagation()} />
-          )*/}
-          </Button>
+            <span>
+              <StarOutlined onClick={() => handleFavorite(record.id)} />
+            </span>
+          )}
+
           <Link href={`/coins/${record.id}`}>
             <EyeOutlined />
           </Link>
-        </>
+        </div>
       ),
     },
   ];
 
-  function handleFavorite(e: React.MouseEvent<HTMLInputElement>) {
-    /*setFavorites((prev: any) => {
-      if (prev.includes(e.target.name)) {
-        localStorage.setItem(
-          "favorites",
-          JSON.stringify(prev.filter((el: string) => el !== e.target.name))
-        );
-        return prev.filter((el: string) => el !== e.target.name);
-      }
-      return [...prev, e.target.name];
-    });
-    localStorage.setItem(
-      "favorites",
-      JSON.stringify([...favorites, e.target.name])
-    );*/
-  }
   return (
     <Card className={classes["coin-table"]} title="Coin Table" bordered={false}>
-      <Table
-        rowKey={"id"}
-        scroll={{ x: 400 }}
-        columns={columns}
-        pagination={{}}
-        dataSource={data}
-      />
+      <Suspense fallback={<CoinsLoadingPage />}>
+        <Table
+          rowKey={"id"}
+          scroll={{ x: 400 }}
+          columns={columns}
+          pagination={{
+            onChange: (page) => handlePageChange(page),
+          }}
+          dataSource={data}
+        />
+      </Suspense>
     </Card>
   );
 }

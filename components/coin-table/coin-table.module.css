@@ -9,3 +9,8 @@
 .low {
   color: red;
 }
+
+.actionCell {
+  display: flex;
+  justify-content: space-evenly;
+}
