@@ -1,5 +1,6 @@
 "use server";
 const main_url = "https://api.coingecko.com/api/v3/coins/";
+const search_url = "https://api.coingecko.com/api/v3/search";
 
 const currency = "usd";
 
@@ -25,16 +26,41 @@ export async function getCoins(page: string) {
 }
 
 export async function getCoinDetail(id: string) {
+  try {
+    let params = {
+      localization: "false",
+      tickers: "false",
+      market_data: "true",
+      community_data: "false",
+      developer_data: "false",
+      sparkline: "false",
+    };
+
+    let url = main_url + id + "?" + new URLSearchParams(params);
+
+    const res = await fetch(url, {
+      headers: {
+        "x-cg-demo-api-key": process.env.GECKO_APIKEY,
+      },
+      next: { revalidate: 3600 },
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch data");
+    }
+
+    return res.json();
+  } catch (error) {
+    return 500;
+  }
+}
+
+export async function searchCoin(q: string) {
   let params = {
-    localization: "false",
-    tickers: "false",
-    market_data: "true",
-    community_data: "false",
-    developer_data: "false",
-    sparkline: "false",
+    query: q,
   };
 
-  let url = main_url + id + "?" + new URLSearchParams(params);
+  let url = search_url + "?" + new URLSearchParams(params);
 
   const res = await fetch(url, {
     headers: {
@@ -51,25 +77,29 @@ export async function getCoinDetail(id: string) {
 }
 
 export async function getChartData(id: string, days: string = "365") {
-  const requestHeaders: HeadersInit = new Headers();
-  let params = {
-    vs_currency: currency,
-    days: days,
-    precision: "4",
-  };
-  requestHeaders.set("x-cg-demo-api-key", process.env.GECKO_APIKEY);
-  let url = main_url + id + "/market_chart" + "?" + new URLSearchParams(params);
+  try {
+    const requestHeaders: HeadersInit = new Headers();
+    let params = {
+      vs_currency: currency,
+      days: days,
+      precision: "4",
+    };
+    requestHeaders.set("x-cg-demo-api-key", process.env.GECKO_APIKEY);
+    let url =
+      main_url + id + "/market_chart" + "?" + new URLSearchParams(params);
 
-  const res = await fetch(url, {
-    headers: {
-      "x-cg-demo-api-key": process.env.GECKO_APIKEY,
-    },
-    next: { revalidate: 3600 },
-  });
+    const res = await fetch(url, {
+      headers: {
+        "x-cg-demo-api-key": process.env.GECKO_APIKEY,
+      },
+      next: { revalidate: 3600 },
+    });
+    if (!res.ok) {
+      throw new Error("Failed to fetch data");
+    }
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch data");
+    return res.json();
+  } catch (error) {
+    return 500;
   }
-
-  return res.json();
 }

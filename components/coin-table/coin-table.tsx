@@ -7,6 +7,7 @@ import React, { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import CoinsLoadingPage from "@/app/loading";
 import Loading from "@/app/loading";
+import SearchInput from "../search/searchInput";
 
 interface DataType {
   id: string;
@@ -167,7 +168,14 @@ function CoinTable({ getCoinsData, favorites, handleFavorite }: Props) {
   ];
 
   return (
-    <Card className={classes["coin-table"]} title="Coin Table" bordered={false}>
+    <Card
+      className={classes["coin-table"]}
+      title="Coin Table"
+      bordered={false}
+      extra={
+        <SearchInput placeholder="Search Coin" style={{ minWidth: "200px" }} />
+      }
+    >
       <Suspense fallback={<CoinsLoadingPage />}>
         <Table
           rowKey={"id"}

@@ -7,8 +7,8 @@
   max-width: 90rem;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
-  grid-gap: 5rem;
-  margin: 2rem auto;
+  grid-gap: 4rem;
+  margin: 1rem auto;
   list-style: none;
   padding: 0;
 }

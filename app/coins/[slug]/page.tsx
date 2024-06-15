@@ -2,9 +2,11 @@
 import { Avatar, Card, Descriptions, DescriptionsProps } from "antd";
 import classes from "./page.module.css";
 import { getChartData, getCoinDetail } from "@/lib/actions";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { priceFormatter } from "@/lib/helper";
 import dynamic from "next/dynamic";
+import CoinsLoadingPage from "@/app/loading";
+import RootError from "@/app/error";
 
 export interface CoinDataType {
   id: string;
@@ -25,6 +27,7 @@ export default function Coin({ params }: { params: { slug: string } }) {
     image: {},
   });
   const [chartData, setChartData] = useState(null);
+  const [error, setError] = useState(false);
 
   const items: DescriptionsProps["items"] = [
     {
@@ -84,7 +87,11 @@ export default function Coin({ params }: { params: { slug: string } }) {
   }, []);
   function getData() {
     getCoinDetail(params.slug).then((res: any) => {
-      setData(res);
+      if (res != 500) {
+        setData(res);
+      } else {
+        setError(true);
+      }
     });
   }
   function getChart() {
@@ -92,7 +99,10 @@ export default function Coin({ params }: { params: { slug: string } }) {
       setChartData(res);
     });
   }
-
+  if (error) {
+    return <RootError />;
+  }
+  if (!data.id) return <CoinsLoadingPage />;
   return (
     <Card
       className={classes.maincard}

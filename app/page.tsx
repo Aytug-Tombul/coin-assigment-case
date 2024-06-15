@@ -45,7 +45,7 @@ export default function Home() {
 
   return (
     <main>
-      <Content style={{ padding: "0 48px" }}>
+      <Content style={{ padding: "0 16px" }}>
         <Favorites favorites={favorites} handleFavorite={handleFavorite} />
         <CoinTable
           getCoinsData={getCoinsData}
